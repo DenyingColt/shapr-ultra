@@ -1,0 +1,25 @@
+{
+  "name": "SHAPR-PRO • 3D Direct & Parametric CAD Studio",
+  "short_name": "SHAPR-PRO",
+  "description": "Commercial 3D B-Rep Direct & Parametric CAD Engine for Android Tablets, S-Pen Stylus, and Desktop Workstations",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0B0D11",
+  "theme_color": "#0B0D11",
+  "categories": ["productivity", "utilities", "design", "education"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='38' fill='%230B0D11'/><path d='M96 28L158 64V128L96 164L34 128V64L96 28Z' fill='none' stroke='%2338bdf8' stroke-width='10'/><path d='M34 64L96 100L158 64M96 164V100' fill='none' stroke='%23facc15' stroke-width='8'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='%230B0D11'/><path d='M256 72L420 168V344L256 440L92 344V168L256 72Z' fill='none' stroke='%2338bdf8' stroke-width='24'/><path d='M92 168L256 264L420 168M256 440V264' fill='none' stroke='%23facc15' stroke-width='20'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

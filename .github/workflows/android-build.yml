@@ -1,0 +1,61 @@
+name: Android Cloud APK & Play Store AAB Builder
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    name: Build ShaprUltra 3D APK & AAB
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Java JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install NPM Dependencies
+        run: npm install
+
+      - name: Build Production Web Bundle (TypeScript + Vite)
+        run: npm run build
+
+      - name: Sync Web Bundle to Capacitor Android Project
+        run: npx cap sync android
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK (Direct Tablet Installable)
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Build Google Play Store Release Bundle (AAB) & Unsigned Release APK
+        run: cd android && ./gradlew bundleRelease assembleRelease
+
+      - name: Upload Installable Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShaprUltra-Debug-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Upload Google Play Store Release AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShaprUltra-PlayStore-AAB
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error

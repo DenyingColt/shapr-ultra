@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ShaprUltra 3D</string>
+    <string name="title_activity_main">ShaprUltra 3D</string>
+    <string name="package_name">com.shaprultra.cad</string>
+    <string name="custom_url_scheme">com.shaprultra.cad</string>
+</resources>
