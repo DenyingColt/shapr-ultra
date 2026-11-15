@@ -9,14 +9,21 @@ import {
   CADBody,
   CADMaterial,
   ConstraintType,
+  ConstructionAxisItem,
+  ConstructionAxisType,
+  ConstructionPlaneType,
+  EnvironmentPresetId,
   HistoryFeatureNode,
   HoleWizardParams,
   InterferenceClash,
+  PBRMaterialPreset,
   ParametricVariable,
+  PinnedMeasurement,
   ReferenceCanvasItem,
   SavedCADProject,
   SectionBoxBounds,
   SelectionFilterMode,
+  ShaprWorkspace,
   SheetMetalParams,
   Sketch,
   SketchPlane,
@@ -164,6 +171,214 @@ export const DEFAULT_MATERIALS: Record<string, CADMaterial> = {
     densityGPerCm3: 1.06,
   },
 };
+
+export const SHAPR_MATERIAL_LIBRARY: PBRMaterialPreset[] = [
+  // METALS
+  {
+    id: 'anodized_sky_alu',
+    category: 'metals',
+    name: 'Eloksal Mavi Alüminyum (6061)',
+    color: '#38bdf8',
+    metalness: 0.72,
+    roughness: 0.28,
+    opacity: 1.0,
+    densityGPerCm3: 2.7,
+  },
+  {
+    id: 'brushed_stainless_316',
+    category: 'metals',
+    name: 'Fırçalanmış Paslanmaz Çelik 316L',
+    color: '#cbd5e1',
+    metalness: 0.88,
+    roughness: 0.22,
+    opacity: 1.0,
+    densityGPerCm3: 7.85,
+  },
+  {
+    id: 'titanium_grade5',
+    category: 'metals',
+    name: 'Mat Titanyum (Ti-6Al-4V)',
+    color: '#64748b',
+    metalness: 0.78,
+    roughness: 0.38,
+    opacity: 1.0,
+    densityGPerCm3: 4.43,
+  },
+  {
+    id: 'polished_brass',
+    category: 'metals',
+    name: 'Parlak Mekanik Pirinç (C360)',
+    color: '#f59e0b',
+    metalness: 0.86,
+    roughness: 0.18,
+    opacity: 1.0,
+    densityGPerCm3: 8.4,
+  },
+  {
+    id: 'electrolytic_copper',
+    category: 'metals',
+    name: 'Saf Bakır (Soğutucu Blok)',
+    color: '#ea580c',
+    metalness: 0.9,
+    roughness: 0.2,
+    opacity: 1.0,
+    densityGPerCm3: 8.96,
+  },
+  {
+    id: 'satin_gold_24k',
+    category: 'metals',
+    name: 'Saten Altın Kaplama (24K)',
+    color: '#fbbf24',
+    metalness: 0.94,
+    roughness: 0.16,
+    opacity: 1.0,
+    densityGPerCm3: 19.3,
+  },
+  // PLASTICS & COMPOSITES
+  {
+    id: 'abs_pure_white',
+    category: 'plastics',
+    name: 'Enjeksiyon ABS Parlak Beyaz',
+    color: '#f8fafc',
+    metalness: 0.05,
+    roughness: 0.24,
+    opacity: 1.0,
+    densityGPerCm3: 1.06,
+  },
+  {
+    id: 'pc_matte_black',
+    category: 'plastics',
+    name: 'Dokulu Mat Siyah Polikarbonat',
+    color: '#1e293b',
+    metalness: 0.1,
+    roughness: 0.68,
+    opacity: 1.0,
+    densityGPerCm3: 1.2,
+  },
+  {
+    id: 'carbon_fiber_3k',
+    category: 'plastics',
+    name: '3K Dokuma Karbon Fiber Epoksi',
+    color: '#334155',
+    metalness: 0.35,
+    roughness: 0.35,
+    opacity: 1.0,
+    densityGPerCm3: 1.55,
+  },
+  {
+    id: 'silicone_coral',
+    category: 'plastics',
+    name: 'Medikal Silikon Elastomer (Mercan)',
+    color: '#f43f5e',
+    metalness: 0.02,
+    roughness: 0.78,
+    opacity: 1.0,
+    densityGPerCm3: 1.15,
+  },
+  {
+    id: 'nylon_pa12_sls',
+    category: 'plastics',
+    name: 'SLS Naylon PA12 Endüstriyel Gri',
+    color: '#94a3b8',
+    metalness: 0.04,
+    roughness: 0.72,
+    opacity: 1.0,
+    densityGPerCm3: 1.01,
+  },
+  // WOODS
+  {
+    id: 'american_walnut',
+    category: 'woods',
+    name: 'Cilalı Amerikan Ceviz Ahşap',
+    color: '#78350f',
+    metalness: 0.05,
+    roughness: 0.42,
+    opacity: 1.0,
+    densityGPerCm3: 0.65,
+  },
+  {
+    id: 'nordic_oak',
+    category: 'woods',
+    name: 'Doğal İskandinav Meşe',
+    color: '#d97706',
+    metalness: 0.04,
+    roughness: 0.55,
+    opacity: 1.0,
+    densityGPerCm3: 0.75,
+  },
+  {
+    id: 'cnc_mdf_board',
+    category: 'woods',
+    name: 'CNC Prototip Ham MDF',
+    color: '#b45309',
+    metalness: 0.02,
+    roughness: 0.82,
+    opacity: 1.0,
+    densityGPerCm3: 0.72,
+  },
+  // GLASS & LIQUIDS
+  {
+    id: 'optical_clear_glass',
+    category: 'glass',
+    name: 'Optik Borosilikat Cam',
+    color: '#e0f2fe',
+    metalness: 0.1,
+    roughness: 0.05,
+    opacity: 0.32,
+    densityGPerCm3: 2.23,
+  },
+  {
+    id: 'frosted_acrylic_pmma',
+    category: 'glass',
+    name: 'Kumlanmış Buzlu Pleksiglas (PMMA)',
+    color: '#bae6fd',
+    metalness: 0.05,
+    roughness: 0.45,
+    opacity: 0.55,
+    densityGPerCm3: 1.18,
+  },
+  {
+    id: 'smoked_polycarbonate',
+    category: 'glass',
+    name: 'Füme Koruyucu Vizör Camı',
+    color: '#38bdf8',
+    metalness: 0.15,
+    roughness: 0.12,
+    opacity: 0.45,
+    densityGPerCm3: 1.2,
+  },
+  // AUTOMOTIVE & STONE
+  {
+    id: 'auto_metallic_emerald',
+    category: 'automotive',
+    name: 'Metalik Zümrüt Otomotiv Boyası',
+    color: '#10b981',
+    metalness: 0.65,
+    roughness: 0.14,
+    opacity: 1.0,
+    densityGPerCm3: 1.4,
+  },
+  {
+    id: 'auto_racing_red',
+    category: 'automotive',
+    name: 'İtalyan Yarış Kırmızısı Vernikli',
+    color: '#ef4444',
+    metalness: 0.52,
+    roughness: 0.12,
+    opacity: 1.0,
+    densityGPerCm3: 1.4,
+  },
+  {
+    id: 'granite_surface_plate',
+    category: 'stone',
+    name: 'Siyah Metroloji Granit Tabla',
+    color: '#334155',
+    metalness: 0.18,
+    roughness: 0.3,
+    opacity: 1.0,
+    densityGPerCm3: 2.75,
+  },
+];
 
 export function createCADBodyFromGeometry(
   geometry: THREE.BufferGeometry,
@@ -487,12 +702,71 @@ interface CADStoreState {
     expression?: string
   ) => void;
 
+  // Shapr3D 5.x/26.x Authentic Workspaces, Drawers, Modes, Construction & Visualization
+  activeWorkspace: ShaprWorkspace;
+  isItemsDrawerOpen: boolean;
+  isHistorySidebarOpen: boolean;
+  historyFilterBySelection: boolean;
+  isolateModeActive: boolean;
+  measureModeActive: boolean;
+  pinnedMeasurements: PinnedMeasurement[];
+  constructionAxes: ConstructionAxisItem[];
+  revolveElevationMm: number;
+  scaleUniformFactor: number;
+  scaleAxisFactors: Vec3;
+  environmentPreset: EnvironmentPresetId;
+  envRotationDeg: number;
+  envAltitudeDeg: number;
+  envIntensity: number;
+  groundReflection: boolean;
+
   // Variables & Parametric History
   addVariable: (name: string, expression: string, unit?: UnitSystem | 'deg' | 'unitless') => void;
   updateVariable: (id: string, expression: string) => void;
   removeVariable: (id: string) => void;
   setRollbackIndex: (idx: number) => void;
   toggleSuppressFeature: (featureId: string) => void;
+
+  // Shapr3D Authentic UI & Video Manual Actions
+  setActiveWorkspace: (ws: ShaprWorkspace) => void;
+  setItemsDrawerOpen: (open: boolean) => void;
+  setHistorySidebarOpen: (open: boolean) => void;
+  setHistoryFilterBySelection: (filter: boolean) => void;
+  toggleIsolateMode: () => void;
+  toggleMeasureMode: () => void;
+  pinCurrentMeasurement: (
+    label: string,
+    valueStr: string,
+    type?: PinnedMeasurement['type']
+  ) => void;
+  removePinnedMeasurement: (id: string) => void;
+  clearPinnedMeasurements: () => void;
+  addConstructionPlane: (type: ConstructionPlaneType, offsetOrAngle?: number) => void;
+  addConstructionAxis: (type: ConstructionAxisType) => void;
+  commitAlignBodies: (flipNormal?: boolean) => void;
+  commitScaleBody: (
+    uniformFactor: number,
+    nonUniform?: Vec3,
+    makeCopy?: boolean
+  ) => void;
+  commitTranslateBody: (delta: Vec3, makeCopy?: boolean) => void;
+  commitHelicalRevolve: (angleDeg: number, elevationMm: number) => void;
+  setEnvironmentConfig: (
+    patch: Partial<{
+      preset: EnvironmentPresetId;
+      rotationDeg: number;
+      altitudeDeg: number;
+      intensity: number;
+      groundReflection: boolean;
+    }>
+  ) => void;
+  applyPBRMaterialPreset: (presetId: string, targetBodyId?: string) => void;
+  updateHistoryStepParam: (
+    featureId: string,
+    paramKey: string,
+    newValue: number | string | boolean
+  ) => void;
+  mergeHistorySteps: () => void;
 
   // Undo / Redo & Modals
   pushUndoSnapshot: () => void;
@@ -902,6 +1176,49 @@ export const useCADStore = create<CADStoreState>((set, get) => {
     },
     sheetMetalParams: { ...DEFAULT_SHEET_METAL_PARAMS },
     flatPatternResult: null,
+
+    activeWorkspace: 'modeling',
+    isItemsDrawerOpen: false,
+    isHistorySidebarOpen: true,
+    historyFilterBySelection: false,
+    isolateModeActive: false,
+    measureModeActive: false,
+    pinnedMeasurements: [
+      {
+        id: 'pin_default_1',
+        label: 'Merkez Rulman Delik Çapı (Ø)',
+        valueStr: '20.00 mm',
+        type: 'radius',
+        entityIds: ['body_starter_bracket'],
+        timestamp: Date.now() - 10000,
+      },
+      {
+        id: 'pin_default_2',
+        label: 'Montaj Delikleri Eksen Aralığı',
+        valueStr: '56.00 mm',
+        type: 'distance',
+        entityIds: ['body_starter_bracket'],
+        timestamp: Date.now() - 5000,
+      },
+    ],
+    constructionAxes: [
+      {
+        id: 'axis_center_z',
+        name: 'Eksen 1 (Ana Rulman Ekseni Z)',
+        origin: [0, 0, -10],
+        direction: [0, 0, 1],
+        lengthMm: 60,
+        visible: true,
+      },
+    ],
+    revolveElevationMm: 0,
+    scaleUniformFactor: 1.0,
+    scaleAxisFactors: [1.0, 1.0, 1.0],
+    environmentPreset: 'studio_softbox',
+    envRotationDeg: 45,
+    envAltitudeDeg: 35,
+    envIntensity: 1.15,
+    groundReflection: true,
 
     setProjectName: (name) => {
       set({ projectName: name });
@@ -3962,6 +4279,617 @@ export const useCADStore = create<CADStoreState>((set, get) => {
             ? 'Çakışma Testi Tamamlandı: Gövdeler arasında çakışma (Interference) bulunamadı!'
             : `Çakışma Testi: ${clashes.length} adet hacimsel girişim (Clash) tespit edildi.`,
       });
+    },
+
+    // =========================================================================
+    // SHAPR3D AUTHENTIC WORKSPACES, MODES, CONSTRUCT, TRANSFORM & HISTORY CARDS
+    // =========================================================================
+    setActiveWorkspace: (ws) => {
+      triggerHapticPulse('snap');
+      set({
+        activeWorkspace: ws,
+        statusMessage:
+          ws === 'modeling'
+            ? '3B Modelleme Alanı (Modeling Space) aktif.'
+            : ws === 'visualization'
+            ? 'Shapr3D Görselleştirme & PBR Render Stüdyosu aktif.'
+            : 'Shapr3D 2B ISO/ANSI Teknik Resim Alanı (2D Drawings) aktif.',
+      });
+    },
+
+    setItemsDrawerOpen: (open) => set({ isItemsDrawerOpen: open }),
+    setHistorySidebarOpen: (open) => set({ isHistorySidebarOpen: open }),
+    setHistoryFilterBySelection: (filter) =>
+      set({ historyFilterBySelection: filter }),
+
+    toggleIsolateMode: () => {
+      const s = get();
+      triggerHapticPulse('snap');
+      const next = !s.isolateModeActive;
+      if (next) {
+        const targetIds =
+          s.selectedBodyIds.length > 0
+            ? s.selectedBodyIds
+            : s.bodies[0]
+            ? [s.bodies[0].id]
+            : [];
+        set({
+          isolateModeActive: true,
+          bodies: s.bodies.map((b) => ({
+            ...b,
+            isolated: targetIds.includes(b.id),
+            visible: targetIds.includes(b.id),
+          })),
+          statusMessage: `İzolasyon Modu (Isolate) Aktif: Yalnızca seçili ${targetIds.length} gövde gösteriliyor.`,
+        });
+      } else {
+        set({
+          isolateModeActive: false,
+          bodies: s.bodies.map((b) => ({
+            ...b,
+            isolated: false,
+            visible: true,
+          })),
+          statusMessage: 'İzolasyon Modu kapatıldı: Tüm gövdeler görünür durumda.',
+        });
+      }
+    },
+
+    toggleMeasureMode: () => {
+      const s = get();
+      triggerHapticPulse('snap');
+      const next = !s.measureModeActive;
+      set({
+        measureModeActive: next,
+        activeTool: next ? 'measure_tool' : 'select',
+        statusMessage: next
+          ? 'Ölçüm Modu (Measure Mode) Aktif: Kenar, yüzey veya noktalara dokunarak mesafe/açı/yarıçap ölçün ve sabitleyin.'
+          : 'Ölçüm Modu kapatıldı.',
+      });
+    },
+
+    pinCurrentMeasurement: (label, valueStr, type = 'distance') => {
+      const s = get();
+      triggerHapticPulse('commit');
+      const newPin: PinnedMeasurement = {
+        id: uuidv4(),
+        label,
+        valueStr,
+        type,
+        entityIds: [...s.selectedBodyIds, ...s.selectedFaceIds, ...s.selectedEdgeIds],
+        timestamp: Date.now(),
+      };
+      set({
+        pinnedMeasurements: [newPin, ...s.pinnedMeasurements],
+        statusMessage: `Ölçüm sabitlendi: ${label} = ${valueStr}`,
+      });
+    },
+
+    removePinnedMeasurement: (id) =>
+      set((s) => ({
+        pinnedMeasurements: s.pinnedMeasurements.filter((m) => m.id !== id),
+      })),
+
+    clearPinnedMeasurements: () =>
+      set({
+        pinnedMeasurements: [],
+        statusMessage: 'Sabitlenmiş tüm ölçümler temizlendi.',
+      }),
+
+    addConstructionPlane: (type, offsetOrAngle = 25) => {
+      const s = get();
+      triggerHapticPulse('commit');
+      const idx = s.constructionPlanes.length + 1;
+      let origin: Vec3 = [0, 0, offsetOrAngle];
+      let normal: Vec3 = [0, 0, 1];
+      let xAxis: Vec3 = [1, 0, 0];
+      let yAxis: Vec3 = [0, 1, 0];
+      let label = `Öteleme Düzlemi ${idx} (+${offsetOrAngle}mm)`;
+
+      const hostBody = s.bodies.find((b) => s.selectedBodyIds.includes(b.id)) || s.bodies[0];
+      const selFace =
+        hostBody && s.selectedFaceIds.length > 0
+          ? hostBody.topology.faces.find((f) => f.id === s.selectedFaceIds[0])
+          : undefined;
+
+      if (type === 'offset') {
+        if (selFace) {
+          origin = [
+            selFace.center[0] + selFace.normal[0] * offsetOrAngle,
+            selFace.center[1] + selFace.normal[1] * offsetOrAngle,
+            selFace.center[2] + selFace.normal[2] * offsetOrAngle,
+          ];
+          normal = [...selFace.normal];
+        } else {
+          origin = [0, 0, offsetOrAngle];
+        }
+        label = `Offset Plane ${idx} (${offsetOrAngle} mm)`;
+      } else if (type === 'midplane') {
+        if (hostBody && s.selectedFaceIds.length >= 2) {
+          const fA = hostBody.topology.faces.find((f) => f.id === s.selectedFaceIds[0]);
+          const fB = hostBody.topology.faces.find((f) => f.id === s.selectedFaceIds[1]);
+          if (fA && fB) {
+            origin = [
+              (fA.center[0] + fB.center[0]) * 0.5,
+              (fA.center[1] + fB.center[1]) * 0.5,
+              (fA.center[2] + fB.center[2]) * 0.5,
+            ];
+            normal = [...fA.normal];
+          }
+        } else {
+          origin = [0, 0, 14];
+        }
+        label = `Orta Düzlem (Midplane) ${idx}`;
+      } else if (type === 'angle') {
+        const rad = (offsetOrAngle * Math.PI) / 180;
+        origin = [0, 0, 12];
+        normal = [0, -Math.sin(rad), Math.cos(rad)];
+        yAxis = [0, Math.cos(rad), Math.sin(rad)];
+        label = `Açılı Düzlem (Angle ${offsetOrAngle}°) ${idx}`;
+      } else if (type === 'three_points') {
+        origin = [0, 0, 18];
+        normal = [0.25, 0.25, 0.935];
+        label = `3-Nokta Düzlemi ${idx}`;
+      } else if (type === 'tangent') {
+        origin = [18, 0, 22];
+        normal = [1, 0, 0];
+        xAxis = [0, 1, 0];
+        yAxis = [0, 0, 1];
+        label = `Silindire Teğet Düzlem ${idx}`;
+      } else if (type === 'perp_curve') {
+        origin = [0, 15, 12];
+        normal = [0, 1, 0];
+        xAxis = [1, 0, 0];
+        yAxis = [0, 0, 1];
+        label = `Eğriye Dik Düzlem (Sweep) ${idx}`;
+      }
+
+      const newPlane: SketchPlane = {
+        id: `cplane_${Date.now()}`,
+        name: label,
+        origin,
+        normal,
+        xAxis,
+        yAxis,
+        visible: true,
+      };
+
+      const featNode: HistoryFeatureNode = {
+        id: uuidv4(),
+        name: label,
+        type: 'construct_plane',
+        suppressed: false,
+        timestamp: Date.now(),
+        params: { planeType: type, offsetOrAngle },
+        targetBodyIds: [],
+      };
+
+      set({
+        constructionPlanes: [...s.constructionPlanes, newPlane],
+        history: [...s.history, featNode],
+        rollbackIndex: s.history.length,
+        statusMessage: `Referans Yardımcı Düzlem eklendi: ${label}`,
+      });
+      scheduleDebouncedAutoSave(get);
+    },
+
+    addConstructionAxis: (type) => {
+      const s = get();
+      triggerHapticPulse('commit');
+      const idx = s.constructionAxes.length + 1;
+      let origin: Vec3 = [0, 0, -10];
+      let direction: Vec3 = [0, 0, 1];
+      let label = `Yardımcı Eksen ${idx}`;
+
+      const hostBody = s.bodies.find((b) => s.selectedBodyIds.includes(b.id)) || s.bodies[0];
+      if (type === 'cylinder_center') {
+        const cylFace = hostBody?.topology.faces.find(
+          (f) => f.surfaceType === 'cylindrical'
+        );
+        if (cylFace) {
+          origin = [...cylFace.center];
+          direction = cylFace.cylinderAxis ? [...cylFace.cylinderAxis] : [0, 0, 1];
+        }
+        label = `Silindir Merkez Ekseni ${idx}`;
+      } else if (type === 'two_points') {
+        origin = [-28, 0, 0];
+        direction = [1, 0, 0];
+        label = `2-Nokta Ekseni ${idx}`;
+      } else if (type === 'plane_intersection') {
+        origin = [0, 0, 0];
+        direction = [0, 1, 0];
+        label = `İki Düzlem Kesişim Ekseni ${idx}`;
+      } else if (type === 'face_normal') {
+        const face0 = hostBody?.topology.faces[0];
+        if (face0) {
+          origin = [...face0.center];
+          direction = [...face0.normal];
+        }
+        label = `Yüzey Normali Ekseni ${idx}`;
+      }
+
+      const newAxis: ConstructionAxisItem = {
+        id: `caxis_${Date.now()}`,
+        name: label,
+        origin,
+        direction,
+        lengthMm: 65,
+        visible: true,
+      };
+
+      const featNode: HistoryFeatureNode = {
+        id: uuidv4(),
+        name: label,
+        type: 'construct_axis',
+        suppressed: false,
+        timestamp: Date.now(),
+        params: { axisType: type },
+        targetBodyIds: [],
+      };
+
+      set({
+        constructionAxes: [...s.constructionAxes, newAxis],
+        history: [...s.history, featNode],
+        rollbackIndex: s.history.length,
+        statusMessage: `Referans Yardımcı Eksen eklendi: ${label}`,
+      });
+      scheduleDebouncedAutoSave(get);
+    },
+
+    commitAlignBodies: (flipNormal = false) => {
+      const s = get();
+      if (s.bodies.length < 2) {
+        set({
+          statusMessage: 'Hizalama (Align) için sahnede en az 2 gövde bulunmalıdır.',
+        });
+        return;
+      }
+      s.pushUndoSnapshot();
+      triggerHapticPulse('commit');
+
+      const movingBody =
+        s.bodies.find((b) => s.selectedBodyIds.includes(b.id)) ||
+        s.bodies[s.bodies.length - 1];
+      const refBody =
+        s.bodies.find((b) => b.id !== movingBody.id) || s.bodies[0];
+
+      refBody.geometry.computeBoundingBox();
+      movingBody.geometry.computeBoundingBox();
+      const refBox = refBody.geometry.boundingBox!;
+      const movBox = movingBody.geometry.boundingBox!;
+
+      const refCenter = new THREE.Vector3();
+      const movCenter = new THREE.Vector3();
+      refBox.getCenter(refCenter);
+      movBox.getCenter(movCenter);
+
+      const dx = refCenter.x - movCenter.x;
+      const dy = refCenter.y - movCenter.y;
+      const dz = refBox.max.z - movBox.min.z;
+
+      const alignedGeom = movingBody.geometry.clone();
+      alignedGeom.translate(dx, dy, dz);
+      if (flipNormal) {
+        alignedGeom.rotateX(Math.PI);
+      }
+
+      const updatedBody = createCADBodyFromGeometry(
+        alignedGeom,
+        movingBody.name,
+        movingBody.material,
+        movingBody.id
+      );
+
+      const featNode: HistoryFeatureNode = {
+        id: uuidv4(),
+        name: `Hizala (Align: ${movingBody.name} → ${refBody.name})`,
+        type: 'align',
+        suppressed: false,
+        timestamp: Date.now(),
+        params: { flipNormal, dx: Math.round(dx), dy: Math.round(dy), dz: Math.round(dz) },
+        targetBodyIds: [movingBody.id, refBody.id],
+      };
+
+      set({
+        bodies: s.bodies.map((b) => (b.id === movingBody.id ? updatedBody : b)),
+        history: [...s.history, featNode],
+        rollbackIndex: s.history.length,
+        activeTool: 'select',
+        statusMessage: `Align Tamamlandı: ${movingBody.name}, ${refBody.name} üst düzlemine eş merkezli hizalandı.`,
+      });
+      scheduleDebouncedAutoSave(get);
+    },
+
+    commitScaleBody: (uniformFactor, nonUniform, makeCopy = false) => {
+      const s = get();
+      const targetBody =
+        s.bodies.find((b) => s.selectedBodyIds.includes(b.id)) || s.bodies[0];
+      if (!targetBody) return;
+
+      s.pushUndoSnapshot();
+      triggerHapticPulse('commit');
+
+      const sx = nonUniform ? nonUniform[0] : uniformFactor;
+      const sy = nonUniform ? nonUniform[1] : uniformFactor;
+      const sz = nonUniform ? nonUniform[2] : uniformFactor;
+
+      const scaledGeom = targetBody.geometry.clone();
+      scaledGeom.scale(sx, sy, sz);
+
+      const featNode: HistoryFeatureNode = {
+        id: uuidv4(),
+        name: `Ölçekle (Scale ${sx.toFixed(2)}×${sy.toFixed(2)}×${sz.toFixed(2)})`,
+        type: 'scale',
+        suppressed: false,
+        timestamp: Date.now(),
+        params: { factor: uniformFactor, sx, sy, sz, copy: makeCopy },
+        targetBodyIds: [targetBody.id],
+      };
+
+      if (makeCopy) {
+        const copyBody = createCADBodyFromGeometry(
+          scaledGeom,
+          `${targetBody.name}_Olcekli`,
+          targetBody.material
+        );
+        set({
+          bodies: [...s.bodies, copyBody],
+          selectedBodyIds: [copyBody.id],
+          scaleUniformFactor: uniformFactor,
+          history: [...s.history, featNode],
+          rollbackIndex: s.history.length,
+          activeTool: 'select',
+          statusMessage: `${targetBody.name} kopyalanarak (${sx.toFixed(2)}x) ölçeklendi.`,
+        });
+      } else {
+        const updated = createCADBodyFromGeometry(
+          scaledGeom,
+          targetBody.name,
+          targetBody.material,
+          targetBody.id
+        );
+        set({
+          bodies: s.bodies.map((b) => (b.id === targetBody.id ? updated : b)),
+          scaleUniformFactor: uniformFactor,
+          history: [...s.history, featNode],
+          rollbackIndex: s.history.length,
+          activeTool: 'select',
+          statusMessage: `${targetBody.name} (${sx.toFixed(2)}x, ${sy.toFixed(2)}x, ${sz.toFixed(2)}x) oranında ölçeklendi.`,
+        });
+      }
+      scheduleDebouncedAutoSave(get);
+    },
+
+    commitTranslateBody: (delta, makeCopy = false) => {
+      const s = get();
+      const targetBody =
+        s.bodies.find((b) => s.selectedBodyIds.includes(b.id)) || s.bodies[0];
+      if (!targetBody) return;
+
+      s.pushUndoSnapshot();
+      triggerHapticPulse('commit');
+
+      const movedGeom = targetBody.geometry.clone();
+      movedGeom.translate(delta[0], delta[1], delta[2]);
+
+      const featNode: HistoryFeatureNode = {
+        id: uuidv4(),
+        name: `Taşı (Translate Δ[${delta[0]}, ${delta[1]}, ${delta[2]}] mm)`,
+        type: 'translate',
+        suppressed: false,
+        timestamp: Date.now(),
+        params: { dx: delta[0], dy: delta[1], dz: delta[2], copy: makeCopy },
+        targetBodyIds: [targetBody.id],
+      };
+
+      if (makeCopy) {
+        const copyBody = createCADBodyFromGeometry(
+          movedGeom,
+          `${targetBody.name}_Kopya`,
+          targetBody.material
+        );
+        set({
+          bodies: [...s.bodies, copyBody],
+          selectedBodyIds: [copyBody.id],
+          history: [...s.history, featNode],
+          rollbackIndex: s.history.length,
+          activeTool: 'select',
+          statusMessage: `${targetBody.name} kopyalanarak [${delta.join(', ')}] mm taşındı.`,
+        });
+      } else {
+        const updated = createCADBodyFromGeometry(
+          movedGeom,
+          targetBody.name,
+          targetBody.material,
+          targetBody.id
+        );
+        set({
+          bodies: s.bodies.map((b) => (b.id === targetBody.id ? updated : b)),
+          history: [...s.history, featNode],
+          rollbackIndex: s.history.length,
+          activeTool: 'select',
+          statusMessage: `${targetBody.name} [${delta.join(', ')}] mm ötelenerek taşındı.`,
+        });
+      }
+      scheduleDebouncedAutoSave(get);
+    },
+
+    commitHelicalRevolve: (angleDeg, elevationMm) => {
+      const s = get();
+      s.pushUndoSnapshot();
+      triggerHapticPulse('commit');
+
+      const activeSk = s.sketches[s.sketches.length - 1];
+      const profile = activeSk?.closedProfiles[0];
+      let geom: THREE.BufferGeometry;
+
+      if (profile && activeSk) {
+        geom = revolveProfile3D(
+          profile,
+          activeSk.plane,
+          [0, 0, 0],
+          [0, 1, 0],
+          angleDeg
+        );
+      } else {
+        geom = new THREE.TorusGeometry(22, 5, 24, 48, (angleDeg * Math.PI) / 180);
+      }
+
+      if (Math.abs(elevationMm) > 0.01) {
+        const pos = geom.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const y = pos.getY(i);
+          const z = pos.getZ(i);
+          const theta = Math.atan2(y, x);
+          const normalizedTurn = (theta + Math.PI) / (2 * Math.PI);
+          pos.setZ(i, z + normalizedTurn * elevationMm);
+        }
+        pos.needsUpdate = true;
+        geom.computeVertexNormals();
+      }
+
+      const newBody = createCADBodyFromGeometry(
+        geom,
+        `Helisel_Donel_Govde_${s.bodies.length + 1}`,
+        DEFAULT_MATERIALS.brass
+      );
+
+      const featNode: HistoryFeatureNode = {
+        id: uuidv4(),
+        name: `Revolve (${angleDeg}° • Helisel Adım ${elevationMm}mm)`,
+        type: 'helical_revolve',
+        suppressed: false,
+        timestamp: Date.now(),
+        params: { angleDeg, elevationMm },
+        targetBodyIds: [newBody.id],
+        resultBodyId: newBody.id,
+      };
+
+      set({
+        bodies: [...s.bodies, newBody],
+        selectedBodyIds: [newBody.id],
+        revolveAngleDeg: angleDeg,
+        revolveElevationMm: elevationMm,
+        history: [...s.history, featNode],
+        rollbackIndex: s.history.length,
+        activeTool: 'select',
+        statusMessage: `Revolve (${angleDeg}°, Helisel Yükselti=${elevationMm}mm) katı gövdesi oluşturuldu.`,
+      });
+      scheduleDebouncedAutoSave(get);
+    },
+
+    setEnvironmentConfig: (patch) =>
+      set((s) => ({
+        environmentPreset: patch.preset ?? s.environmentPreset,
+        envRotationDeg: patch.rotationDeg ?? s.envRotationDeg,
+        envAltitudeDeg: patch.altitudeDeg ?? s.envAltitudeDeg,
+        envIntensity: patch.intensity ?? s.envIntensity,
+        groundReflection: patch.groundReflection ?? s.groundReflection,
+      })),
+
+    applyPBRMaterialPreset: (presetId, targetBodyId) => {
+      const s = get();
+      const preset = SHAPR_MATERIAL_LIBRARY.find((m) => m.id === presetId);
+      if (!preset) return;
+      triggerHapticPulse('snap');
+
+      const targetIds = targetBodyId
+        ? [targetBodyId]
+        : s.selectedBodyIds.length > 0
+        ? s.selectedBodyIds
+        : s.bodies[0]
+        ? [s.bodies[0].id]
+        : [];
+
+      if (targetIds.length === 0) return;
+
+      set({
+        bodies: s.bodies.map((b) =>
+          targetIds.includes(b.id)
+            ? {
+                ...b,
+                material: {
+                  name: preset.name,
+                  color: preset.color,
+                  metalness: preset.metalness,
+                  roughness: preset.roughness,
+                  opacity: preset.opacity,
+                  densityGPerCm3: preset.densityGPerCm3,
+                },
+              }
+            : b
+        ),
+        statusMessage: `Shapr3D PBR Malzeme Uygulandı: ${preset.name} (${preset.densityGPerCm3} g/cm³)`,
+      });
+      scheduleDebouncedAutoSave(get);
+    },
+
+    updateHistoryStepParam: (featureId, paramKey, newValue) => {
+      const s = get();
+      const node = s.history.find((h) => h.id === featureId);
+      if (!node) return;
+      triggerHapticPulse('snap');
+
+      const updatedHistory = s.history.map((h) =>
+        h.id === featureId
+          ? {
+              ...h,
+              params: {
+                ...h.params,
+                [paramKey]: newValue,
+              },
+            }
+          : h
+      );
+
+      // Live parametric propagation for common numerical parameters
+      const numVal = typeof newValue === 'number' ? newValue : Number(newValue);
+      if (!Number.isNaN(numVal) && numVal > 0) {
+        if (node.type === 'extrude' && paramKey === 'distance') {
+          set({ extrudeDistance: numVal });
+        } else if (
+          (node.type === 'fillet' || node.type === 'chamfer') &&
+          (paramKey === 'radius' || paramKey === 'amount')
+        ) {
+          set({ filletChamferAmount: numVal });
+        } else if (node.type === 'shell' && paramKey === 'thickness') {
+          set({ shellThickness: numVal });
+        } else if (node.type === 'scale' && paramKey === 'factor') {
+          get().commitScaleBody(numVal);
+          return;
+        }
+      }
+
+      set({
+        history: updatedHistory,
+        statusMessage: `Parametrik Geçmiş Güncellendi: ${node.name} → ${paramKey} = ${newValue}`,
+      });
+      scheduleDebouncedAutoSave(get);
+    },
+
+    mergeHistorySteps: () => {
+      const s = get();
+      if (s.history.length <= 1) return;
+      triggerHapticPulse('commit');
+
+      const mergedNode: HistoryFeatureNode = {
+        id: uuidv4(),
+        name: `Birleştirilmiş Baz Gövde (${s.history.length} Unsur)`,
+        type: 'boolean',
+        suppressed: false,
+        timestamp: Date.now(),
+        params: { mergedStepsCount: s.history.length, bodies: s.bodies.length },
+        targetBodyIds: s.bodies.map((b) => b.id),
+      };
+
+      set({
+        history: [mergedNode],
+        rollbackIndex: 0,
+        statusMessage:
+          'Geçmiş Adımları Birleştirildi (Merge History Steps): Tüm adımlar tek bir temel B-Rep gövde adımında toplandı.',
+      });
+      scheduleDebouncedAutoSave(get);
     },
 
     openNumericHUD: (config) =>

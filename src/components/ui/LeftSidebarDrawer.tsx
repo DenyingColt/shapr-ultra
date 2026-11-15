@@ -9,19 +9,24 @@ import {
   Crosshair,
   Plus,
   Trash2,
-  ChevronLeft,
-  ChevronRight,
+  X,
   Sliders,
+  Compass,
 } from 'lucide-react';
 import { DEFAULT_MATERIALS, useCADStore } from '../../store/useCADStore';
 import { ConstraintType } from '../../types/cad';
 
 export const LeftSidebarDrawer: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const isItemsDrawerOpen = useCADStore((s) => s.isItemsDrawerOpen);
+  const setItemsDrawerOpen = useCADStore((s) => s.setItemsDrawerOpen);
+  const activeWorkspace = useCADStore((s) => s.activeWorkspace);
   const [activeTab, setActiveTab] = useState<'tree' | 'vars' | 'constraints'>('tree');
 
   const bodies = useCADStore((s) => s.bodies);
   const sketches = useCADStore((s) => s.sketches);
+  const constructionPlanes = useCADStore((s) => s.constructionPlanes);
+  const constructionAxes = useCADStore((s) => s.constructionAxes);
+
   const selectedBodyIds = useCADStore((s) => s.selectedBodyIds);
   const selectBody = useCADStore((s) => s.selectBody);
   const toggleBodyVisibility = useCADStore((s) => s.toggleBodyVisibility);
@@ -42,24 +47,14 @@ export const LeftSidebarDrawer: React.FC = () => {
   const [newVarName, setNewVarName] = useState('');
   const [newVarExpr, setNewVarExpr] = useState('25mm');
 
-  if (collapsed) {
-    return (
-      <div className="absolute top-16 left-3 z-20">
-        <button
-          onClick={() => setCollapsed(false)}
-          className="p-2.5 rounded-xl bg-slate-900/95 border border-slate-700 text-slate-200 hover:text-white shadow-xl transition"
-          title="Sahne Ağacı & Değişkenler Panelini Aç"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
-    );
+  if (!isItemsDrawerOpen || activeWorkspace === 'drawings2d') {
+    return null;
   }
 
   const selectedBody = bodies.find((b) => b.id === selectedBodyIds[0]);
 
   return (
-    <aside className="w-72 bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 z-20 select-none">
+    <aside className="w-72 bg-[#0E131F]/95 border-r border-slate-800 flex flex-col shrink-0 z-20 select-none">
       {/* Drawer Header & Tab Switcher */}
       <div className="flex items-center justify-between px-2.5 py-2 border-b border-slate-800">
         <div className="grid grid-cols-3 gap-1 bg-slate-950 p-0.5 rounded-lg border border-slate-800 flex-1 mr-2 text-[11px] font-semibold">
@@ -101,15 +96,16 @@ export const LeftSidebarDrawer: React.FC = () => {
         </div>
 
         <button
-          onClick={() => setCollapsed(true)}
+          onClick={() => setItemsDrawerOpen(false)}
           className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white"
+          title="Unsur Ağacını Kapat"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <X className="w-4 h-4" />
         </button>
       </div>
 
       {/* =================================================================== */}
-      {/* TAB 1: SCENE TREE (BODIES, SKETCHES, MATERIALS)                     */}
+      {/* TAB 1: SHAPR3D ITEMS MANAGER (BODIES, SKETCHES, PLANES & AXES)      */}
       {/* =================================================================== */}
       {activeTab === 'tree' && (
         <div className="flex-1 overflow-y-auto p-3 space-y-4 text-xs">
@@ -117,7 +113,7 @@ export const LeftSidebarDrawer: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                3D Katı Gövdeler (B-Rep)
+                3B Katı & Yüzey Gövdeler (Bodies)
               </span>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-sky-400">
                 {bodies.length}
@@ -195,7 +191,7 @@ export const LeftSidebarDrawer: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                2D Parametrik Eskizler
+                2B Parametrik Eskizler (Sketches)
               </span>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
                 {sketches.length}
@@ -217,6 +213,41 @@ export const LeftSidebarDrawer: React.FC = () => {
                   <span className="text-[10px] font-mono text-sky-400">
                     {sk.closedProfiles.length} Profil
                   </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Construction Planes & Axes */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                <Compass className="w-3 h-3 text-amber-400" /> Referans Düzlem & Eksenler
+              </span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-amber-400">
+                {constructionPlanes.length + constructionAxes.length}
+              </span>
+            </div>
+            <div className="space-y-1">
+              {constructionPlanes.map((pl) => (
+                <div
+                  key={pl.id}
+                  onClick={() =>
+                    useCADStore.getState().startSketchOnSelectionOrPlane(pl.id)
+                  }
+                  className="px-2.5 py-1.5 rounded-lg bg-slate-950/70 border border-slate-800 hover:border-amber-500/50 cursor-pointer flex items-center justify-between text-slate-300"
+                >
+                  <span className="truncate">{pl.name}</span>
+                  <span className="text-[10px] font-mono text-amber-400">Düzlem</span>
+                </div>
+              ))}
+              {constructionAxes.map((ax) => (
+                <div
+                  key={ax.id}
+                  className="px-2.5 py-1.5 rounded-lg bg-slate-950/70 border border-slate-800 flex items-center justify-between text-slate-300"
+                >
+                  <span className="truncate">{ax.name}</span>
+                  <span className="text-[10px] font-mono text-cyan-400">Eksen</span>
                 </div>
               ))}
             </div>

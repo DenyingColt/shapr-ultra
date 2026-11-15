@@ -2,6 +2,10 @@ import React, { useEffect } from 'react';
 import { useCADStore } from './store/useCADStore';
 import { TopHeaderBar } from './components/ui/TopHeaderBar';
 import { LeftSidebarDrawer } from './components/ui/LeftSidebarDrawer';
+import { ShaprLeftMainMenu } from './components/ui/ShaprLeftMainMenu';
+import { ShaprHistorySidebar } from './components/ui/ShaprHistorySidebar';
+import { VisualizationSpace } from './components/spaces/VisualizationSpace';
+import { Drawings2DSpace } from './components/spaces/Drawings2DSpace';
 import { AdaptiveContextMenu } from './components/ui/AdaptiveContextMenu';
 import { NumericHUD } from './components/ui/NumericHUD';
 import { HistoryTimeline } from './components/ui/HistoryTimeline';
@@ -23,6 +27,7 @@ import { HoleWizardModal } from './components/ui/HoleWizardModal';
 import { SheetMetalBar } from './components/ui/SheetMetalBar';
 
 export const App: React.FC = () => {
+  const activeWorkspace = useCADStore((s) => s.activeWorkspace);
   const undo = useCADStore((s) => s.undo);
   const redo = useCADStore((s) => s.redo);
   const selectedFaceIds = useCADStore((s) => s.selectedFaceIds);
@@ -81,14 +86,23 @@ export const App: React.FC = () => {
 
   return (
     <div className="flex flex-col w-screen h-screen overflow-hidden bg-[#090d16] text-slate-100 select-none">
-      {/* Top Action & View Bar with IndexedDB Auto-Save Status */}
+      {/* Top Action, Workspace Switcher & View Bar with IndexedDB Auto-Save Status */}
       <TopHeaderBar />
 
-      {/* Main Middle Workspace: Left Sidebar + 3D R3F CAD Viewport */}
-      <div className="flex-1 flex relative overflow-hidden">
-        <LeftSidebarDrawer />
-        <CADViewport />
-      </div>
+      {/* Main Middle Workspace: Shapr3D Modeling / Visualization / 2D Drawings */}
+      {activeWorkspace === 'drawings2d' ? (
+        <Drawings2DSpace />
+      ) : (
+        <div className="flex-1 flex relative overflow-hidden">
+          <LeftSidebarDrawer />
+          <CADViewport />
+          <ShaprHistorySidebar />
+          <VisualizationSpace />
+        </div>
+      )}
+
+      {/* Authentic Shapr3D Left Vertical Main Menu Dock + Bottom-Left Modes Bar */}
+      <ShaprLeftMainMenu />
 
       {/* Top Center Step-by-Step Operation Coach Bar & 3D Print Doctor Modal */}
       <OperationCoachBar />

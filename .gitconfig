@@ -1,3 +1,9 @@
 [user]
 	name = DenyingColt
 	email = 295936394+DenyingColt@users.noreply.github.com
+[credential "https://github.com"]
+	helper = 
+	helper = !'/opt/antigravity/plugins/github/skills/github/scripts/gh' auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/antigravity/plugin_data/github/bin/gh-2.103.3 auth git-credential

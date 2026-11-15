@@ -17,6 +17,60 @@ export type VisualStyle =
 
 export type SelectionFilterMode = 'all' | 'body' | 'face' | 'edge' | 'vertex' | 'sketch';
 
+export type ShaprWorkspace = 'modeling' | 'visualization' | 'drawings2d';
+
+export type ConstructionPlaneType =
+  | 'offset'
+  | 'midplane'
+  | 'angle'
+  | 'three_points'
+  | 'tangent'
+  | 'perp_curve';
+
+export type ConstructionAxisType =
+  | 'cylinder_center'
+  | 'two_points'
+  | 'plane_intersection'
+  | 'face_normal';
+
+export type EnvironmentPresetId =
+  | 'studio_softbox'
+  | 'gradient_mood'
+  | 'industrial_loft'
+  | 'daylight_sun'
+  | 'dark_showroom'
+  | 'warm_workshop';
+
+export interface PBRMaterialPreset {
+  id: string;
+  category: 'metals' | 'plastics' | 'woods' | 'glass' | 'automotive' | 'stone';
+  name: string;
+  color: string;
+  metalness: number;
+  roughness: number;
+  opacity: number;
+  densityGPerCm3: number;
+  clearcoat?: number;
+}
+
+export interface PinnedMeasurement {
+  id: string;
+  label: string;
+  valueStr: string;
+  type: 'distance' | 'angle' | 'area' | 'length' | 'radius' | 'volume';
+  entityIds: string[];
+  timestamp: number;
+}
+
+export interface ConstructionAxisItem {
+  id: string;
+  name: string;
+  origin: Vec3;
+  direction: Vec3;
+  lengthMm: number;
+  visible: boolean;
+}
+
 export type ActiveTool =
   | 'select'
   | 'sketch_pen'
@@ -53,6 +107,12 @@ export type ActiveTool =
   | 'emboss_deboss'
   | 'split_body'
   | 'move_rotate'
+  | 'translate_body'
+  | 'align_bodies'
+  | 'scale_body'
+  | 'construct_plane'
+  | 'construct_axis'
+  | 'measure_tool'
   | 'pattern_linear'
   | 'pattern_circular'
   | 'mirror'
@@ -397,7 +457,13 @@ export type FeatureOperationType =
   | 'sheet_flange'
   | 'sheet_hem'
   | 'assembly_joint'
-  | 'tolerance_comp';
+  | 'tolerance_comp'
+  | 'align'
+  | 'scale'
+  | 'translate'
+  | 'construct_plane'
+  | 'construct_axis'
+  | 'helical_revolve';
 
 export interface HistoryFeatureNode {
   id: string;

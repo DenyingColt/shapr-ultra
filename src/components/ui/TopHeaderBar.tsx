@@ -14,9 +14,13 @@ import {
   ShieldCheck,
   Share2,
   Search,
+  Layers,
+  History,
+  Box,
+  Palette,
 } from 'lucide-react';
 import { useCADStore } from '../../store/useCADStore';
-import { UnitSystem, VisualStyle } from '../../types/cad';
+import { ShaprWorkspace, UnitSystem, VisualStyle } from '../../types/cad';
 import {
   exportBodiesToAsciiSTL,
   exportBodiesToBinarySTL,
@@ -40,6 +44,14 @@ export const TopHeaderBar: React.FC = () => {
     (s) => s.saveCurrentProjectToDevice
   );
 
+  // Shapr3D Project Spaces & Sidebars
+  const activeWorkspace = useCADStore((s) => s.activeWorkspace);
+  const setActiveWorkspace = useCADStore((s) => s.setActiveWorkspace);
+  const isItemsDrawerOpen = useCADStore((s) => s.isItemsDrawerOpen);
+  const setItemsDrawerOpen = useCADStore((s) => s.setItemsDrawerOpen);
+  const isHistorySidebarOpen = useCADStore((s) => s.isHistorySidebarOpen);
+  const setHistorySidebarOpen = useCADStore((s) => s.setHistorySidebarOpen);
+
   const unit = useCADStore((s) => s.unit);
   const setUnit = useCADStore((s) => s.setUnit);
   const gridSnapMm = useCADStore((s) => s.gridSnapMm);
@@ -60,7 +72,6 @@ export const TopHeaderBar: React.FC = () => {
   const redoStack = useCADStore((s) => s.redoStack);
 
   const setMacrosModalOpen = useCADStore((s) => s.setMacrosModalOpen);
-  const setBlueprintModalOpen = useCADStore((s) => s.setBlueprintModalOpen);
   const setMeshDoctorModalOpen = useCADStore((s) => s.setMeshDoctorModalOpen);
   const setCommandPaletteOpen = useCADStore((s) => s.setCommandPaletteOpen);
 
@@ -101,63 +112,86 @@ export const TopHeaderBar: React.FC = () => {
 
   return (
     <header className="h-12 px-3 bg-[#0A0D14]/95 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0 z-30 select-none">
-      {/* Left: Brand, Project Hub Trigger, Auto-Save Status & Editable Project Title */}
-      <div className="flex items-center gap-2">
+      {/* Left: Project Hub, Items Drawer Toggle, Editable Project Name & Shapr3D Workspace Switcher */}
+      <div className="flex items-center gap-1.5">
         <button
           onClick={() => setProjectHubOpen(true)}
-          className="px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm transition"
+          className="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm transition"
+          title="Proje Galerisi & Şablonlar"
         >
-          <FolderKanban className="w-3.5 h-3.5" />
-          <span>Projelerim</span>
+          <FolderKanban className="w-3.5 h-3.5 text-sky-400" />
+          <span className="hidden sm:inline">Projeler</span>
         </button>
 
-        <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg px-2 py-1">
+        {/* Authentic Shapr3D Items (Unsurlar) Toggle */}
+        <button
+          onClick={() => setItemsDrawerOpen(!isItemsDrawerOpen)}
+          className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition ${
+            isItemsDrawerOpen
+              ? 'bg-sky-600 border-sky-500 text-white'
+              : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300'
+          }`}
+          title="Shapr3D Unsur Ağacı & Değişkenler (Items Manager)"
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span className="hidden md:inline">Unsurlar ({bodies.length})</span>
+        </button>
+
+        <div className="hidden xl:flex items-center bg-slate-950 border border-slate-800 rounded-lg px-2 py-1">
           <span
-            className={`w-2 h-2 rounded-full mr-1.5 transition ${
+            onClick={() => saveCurrentProjectToDevice()}
+            className={`w-2 h-2 rounded-full mr-1.5 cursor-pointer transition ${
               autoSaveStatus === 'saving'
                 ? 'bg-amber-400 animate-pulse'
                 : 'bg-emerald-400'
             }`}
+            title="Cihaza Otomatik Kaydedildi"
           />
           <input
             type="text"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
-            className="bg-transparent text-xs font-semibold text-slate-100 w-32 focus:outline-none"
+            className="bg-transparent text-xs font-semibold text-slate-100 w-28 focus:outline-none"
           />
+          <ShieldCheck className="w-3 h-3 text-emerald-400 ml-1" />
         </div>
 
-        <button
-          onClick={() => saveCurrentProjectToDevice()}
-          title="IndexedDB Cihaz Kaydını Doğrula"
-          className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[10px] text-slate-400 hover:text-emerald-400 font-mono transition"
-        >
-          <ShieldCheck className="w-3 h-3 text-emerald-400" />
-          <span>{autoSaveStatus === 'saving' ? 'Kaydediliyor...' : 'Kayıtlı'}</span>
-        </button>
-
-        {/* Universal Command Palette Button (Ctrl+K / /) */}
-        <button
-          onClick={() => setCommandPaletteOpen(true)}
-          className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs text-slate-300 flex items-center gap-1.5 transition"
-          title="Evrensel Komut Arama Paleti (Ctrl+K veya /)"
-        >
-          <Search className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="hidden lg:inline">Komut Ara</span>
-          <kbd className="text-[9px] font-mono bg-slate-950 px-1.5 py-0.5 rounded text-slate-400 border border-slate-800">
-            Ctrl+K
-          </kbd>
-        </button>
+        {/* Authentic Shapr3D Project Space Switcher: Modeling | Visualization | 2D Drawings */}
+        <div className="flex items-center bg-slate-950 border border-slate-800 rounded-xl p-0.5 text-[11px] font-semibold">
+          {(
+            [
+              ['modeling', '3B Modelleme', Box],
+              ['visualization', 'Görselleştirme', Palette],
+              ['drawings2d', '2B Teknik Resim', FileCode2],
+            ] as [ShaprWorkspace, string, React.ElementType][]
+          ).map(([ws, label, Icon]) => {
+            const active = activeWorkspace === ws;
+            return (
+              <button
+                key={ws}
+                onClick={() => setActiveWorkspace(ws)}
+                className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition ${
+                  active
+                    ? 'bg-sky-600 text-white shadow'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">{label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Center: Units, Grid Snap, Undo/Redo, Visual Style (Matcap/Blueprint/Metrology) & Section View */}
+      {/* Center: Undo/Redo, Live Grid Resolution Badge (# mm), Appearance/Visual Style & Section Cut */}
       <div className="flex items-center gap-1.5">
         {/* Undo / Redo */}
         <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg p-0.5">
           <button
             onClick={undo}
             disabled={undoStack.length === 0}
-            title="Geri Al (2 Parmak Çift Dokunuş / Ctrl+Z)"
+            title="Geri Al (2 Parmak Dokunuş / Ctrl+Z)"
             className="p-1.5 rounded hover:bg-slate-800 disabled:opacity-35 text-slate-300 transition"
           >
             <Undo2 className="w-3.5 h-3.5" />
@@ -172,124 +206,132 @@ export const TopHeaderBar: React.FC = () => {
           </button>
         </div>
 
-        {/* Unit Selector */}
-        <select
-          value={unit}
-          onChange={(e) => setUnit(e.target.value as UnitSystem)}
-          className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-mono text-slate-200 focus:outline-none"
-        >
-          <option value="mm">Birim: mm</option>
-          <option value="cm">Birim: cm</option>
-          <option value="m">Birim: m</option>
-          <option value="in">Birim: in</option>
-        </select>
-
-        {/* Grid Snap Selector */}
+        {/* Authentic Shapr3D Live Grid & Units Pill (# 1.0 mm) */}
         <div className="hidden md:flex items-center bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 gap-1 text-xs">
-          <GridIcon className="w-3.5 h-3.5 text-slate-400" />
+          <GridIcon className="w-3.5 h-3.5 text-sky-400" />
           <select
             value={gridSnapMm}
             onChange={(e) => setGridSnapMm(Number(e.target.value))}
             className="bg-transparent font-mono text-xs text-slate-200 focus:outline-none"
+            title="Izgara Yakalama (Grid Snap) Çözünürlüğü"
           >
-            <option value={0.1}>Snap: 0.1mm</option>
-            <option value={0.5}>Snap: 0.5mm</option>
-            <option value={1}>Snap: 1.0mm</option>
-            <option value={2}>Snap: 2.0mm</option>
-            <option value={5}>Snap: 5.0mm</option>
-            <option value={10}>Snap: 10mm</option>
+            <option value={0.1}># 0.1</option>
+            <option value={0.5}># 0.5</option>
+            <option value={1}># 1.0</option>
+            <option value={2}># 2.0</option>
+            <option value={5}># 5.0</option>
+            <option value={10}># 10</option>
+          </select>
+          <select
+            value={unit}
+            onChange={(e) => setUnit(e.target.value as UnitSystem)}
+            className="bg-slate-900 border border-slate-800 rounded px-1 py-0.5 text-[11px] font-mono text-sky-300 focus:outline-none"
+          >
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="m">m</option>
+            <option value="in">in</option>
           </select>
         </div>
 
-        {/* Visual Style Switcher (Matcap, Blueprint, Zebra, Overhang, Metrology Shaders) */}
+        {/* Visual Style / Shapr3D Display Mode Switcher */}
         <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 gap-1 text-xs">
           <Eye className="w-3.5 h-3.5 text-sky-400" />
           <select
             value={visualStyle}
             onChange={(e) => setVisualStyle(e.target.value as VisualStyle)}
-            className="bg-transparent text-xs text-slate-200 focus:outline-none"
+            className="bg-transparent text-xs text-slate-200 focus:outline-none max-w-[145px]"
           >
             <option value="shaded_edges">Katı + B-Rep Kenar</option>
-            <option value="matcap">Stüdyo Matcap (High-Contrast)</option>
-            <option value="blueprint_white">Teknik Mavi Blueprint</option>
+            <option value="matcap">Stüdyo Matcap</option>
+            <option value="blueprint_white">Teknik Blueprint</option>
             <option value="shaded">Yalnızca Gölgeli</option>
             <option value="wireframe">Tel Kafes (Wireframe)</option>
             <option value="xray">X-Ray Yarı Saydam</option>
-            <option value="zebra">Zebra Yüzey Sürekliliği (G2)</option>
-            <option value="overhang">3D Baskı 45° Sarkma Haritası</option>
-            <option value="curvature_map">Eğrilik Haritası (Gaussian Curvature)</option>
-            <option value="draft_analysis">Kalıp Çıkma Açısı Analizi (Draft)</option>
-            <option value="thickness_heatmap">Et Kalınlığı Isı Haritası (Wall Thickness)</option>
+            <option value="zebra">Zebra Analizi (G2)</option>
+            <option value="overhang">3D Baskı 45° Sarkma</option>
+            <option value="curvature_map">Eğrilik Haritası</option>
+            <option value="draft_analysis">Kalıp Çıkma Açısı</option>
+            <option value="thickness_heatmap">Et Kalınlığı Haritası</option>
           </select>
         </div>
 
-        {/* Section Clipping Plane Toggle & Slider */}
-        <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1">
-          <button
-            onClick={toggleSectionView}
-            className={`flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded transition ${
-              sectionViewEnabled
-                ? 'bg-amber-500 text-slate-950 font-bold'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Scissors className="w-3.5 h-3.5" />
-            <span className="hidden xl:inline">Kesit</span>
-          </button>
-
-          {sectionViewEnabled && (
-            <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
-              {(['X', 'Y', 'Z'] as const).map((ax) => (
-                <button
-                  key={ax}
-                  onClick={() => setSectionPlaneAxis(ax)}
-                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
-                    sectionPlaneAxis === ax
-                      ? 'bg-sky-600 text-white'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {ax}
-                </button>
-              ))}
-              <input
-                type="range"
-                min={-60}
-                max={60}
-                step={1}
-                value={sectionPlaneOffset}
-                onChange={(e) => setSectionPlaneOffset(Number(e.target.value))}
-                className="w-16 accent-amber-400"
-              />
-            </div>
-          )}
-        </div>
+        {/* Section Clipping Plane Controls when active */}
+        {sectionViewEnabled && (
+          <div className="hidden lg:flex items-center gap-1 bg-slate-950 border border-amber-500/50 rounded-lg px-2 py-1">
+            <Scissors className="w-3.5 h-3.5 text-amber-400" />
+            {(['X', 'Y', 'Z'] as const).map((ax) => (
+              <button
+                key={ax}
+                onClick={() => setSectionPlaneAxis(ax)}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                  sectionPlaneAxis === ax
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {ax}
+              </button>
+            ))}
+            <input
+              type="range"
+              min={-60}
+              max={60}
+              step={1}
+              value={sectionPlaneOffset}
+              onChange={(e) => setSectionPlaneOffset(Number(e.target.value))}
+              className="w-16 accent-amber-400"
+            />
+            <button
+              onClick={toggleSectionView}
+              className="text-[10px] text-rose-400 hover:text-rose-300 font-bold px-1"
+            >
+              ×
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Right: 3D Print Doctor, Mechanical Macros, Technical Blueprint & Export */}
+      {/* Right: Search, 3D Print Doctor, Macros, Shapr3D History Sidebar Toggle & Export */}
       <div className="flex items-center gap-1.5 relative">
         <button
+          onClick={() => setCommandPaletteOpen(true)}
+          className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-cyan-400 transition"
+          title="Komut Ara (Ctrl+K / /)"
+        >
+          <Search className="w-3.5 h-3.5" />
+        </button>
+
+        <button
           onClick={() => setMeshDoctorModalOpen(true)}
-          className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition"
+          className="px-2 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-1 transition"
+          title="3B Baskı Doktoru & Tolerans Analizi"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span className="hidden lg:inline">3B Baskı Doktoru</span>
+          <span className="hidden xl:inline">3B Doktor</span>
         </button>
 
         <button
           onClick={() => setMacrosModalOpen(true)}
-          className="px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition"
+          className="px-2 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center gap-1 transition"
+          title="ISO Dişli, Cıvata, Yay Üreteci"
         >
           <Cog className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Mekanik Parça</span>
+          <span className="hidden xl:inline">Makro</span>
         </button>
 
+        {/* Authentic Shapr3D Right-Hand History Drawer Toggle */}
         <button
-          onClick={() => setBlueprintModalOpen(true)}
-          className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium flex items-center gap-1.5 transition"
+          onClick={() => setHistorySidebarOpen(!isHistorySidebarOpen)}
+          className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition ${
+            isHistorySidebarOpen
+              ? 'bg-sky-600 border-sky-500 text-white shadow'
+              : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-200'
+          }`}
+          title="Shapr3D Parametrik Geçmiş Kartları (History Sidebar)"
         >
-          <FileCode2 className="w-3.5 h-3.5 text-sky-400" />
-          <span className="hidden md:inline">Teknik Resim & SCAD</span>
+          <History className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Geçmiş ({history.length})</span>
         </button>
 
         <input
@@ -315,7 +357,7 @@ export const TopHeaderBar: React.FC = () => {
             className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Dışa Aktar</span>
+            <span className="hidden sm:inline">Dışa Aktar</span>
           </button>
 
           {exportMenuOpen && (

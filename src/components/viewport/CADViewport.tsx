@@ -171,6 +171,13 @@ export const CADViewport: React.FC = () => {
   const sectionBox = useCADStore((s) => s.sectionBox);
   const clearSelection = useCADStore((s) => s.clearSelection);
 
+  const constructionAxes = useCADStore((s) => s.constructionAxes);
+  const environmentPreset = useCADStore((s) => s.environmentPreset);
+  const envRotationDeg = useCADStore((s) => s.envRotationDeg);
+  const envAltitudeDeg = useCADStore((s) => s.envAltitudeDeg);
+  const envIntensity = useCADStore((s) => s.envIntensity);
+  const groundReflection = useCADStore((s) => s.groundReflection);
+
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
   const clippingPlanes = useMemo(() => {
@@ -198,7 +205,23 @@ export const CADViewport: React.FC = () => {
   const bgColor =
     visualStyle === 'blueprint_white'
       ? '#0f3162'
+      : environmentPreset === 'dark_showroom'
+      ? '#05070c'
+      : environmentPreset === 'daylight_sun'
+      ? '#111b2e'
       : '#090d16';
+
+  const keyLightPos = useMemo<[number, number, number]>(() => {
+    const rotRad = (envRotationDeg * Math.PI) / 180;
+    const altRad = (envAltitudeDeg * Math.PI) / 180;
+    const r = 240;
+    const horiz = r * Math.cos(altRad);
+    return [
+      horiz * Math.cos(rotRad),
+      horiz * Math.sin(rotRad),
+      Math.max(40, r * Math.sin(altRad)),
+    ];
+  }, [envRotationDeg, envAltitudeDeg]);
 
   return (
     <div
@@ -234,22 +257,64 @@ export const CADViewport: React.FC = () => {
 
         <CameraPresetController controlsRef={controlsRef} />
 
-        {/* Studio Multi-Point CAD Lighting */}
-        <ambientLight intensity={visualStyle === 'blueprint_white' ? 1.1 : 0.75} />
+        {/* Studio Multi-Point CAD & Shapr3D Visualization Lighting */}
+        <ambientLight
+          intensity={
+            visualStyle === 'blueprint_white' ? 1.1 : 0.65 * envIntensity
+          }
+        />
         <directionalLight
-          position={[140, -160, 220]}
-          intensity={1.35}
+          position={keyLightPos}
+          intensity={1.35 * envIntensity}
           castShadow
           shadow-mapSize={[1024, 1024]}
         />
-        <directionalLight position={[-150, 140, 90]} intensity={0.65} color="#bae6fd" />
-        <hemisphereLight args={['#e2e8f0', '#1e293b', 0.45]} />
+        <directionalLight
+          position={[-150, 140, 90]}
+          intensity={0.65 * envIntensity}
+          color={environmentPreset === 'warm_workshop' ? '#fed7aa' : '#bae6fd'}
+        />
+        <hemisphereLight
+          args={[
+            environmentPreset === 'gradient_mood' ? '#c7d2fe' : '#e2e8f0',
+            '#1e293b',
+            0.48 * envIntensity,
+          ]}
+        />
 
         {/* Dynamic Multi-Scale Reference Grid */}
         <AdaptiveGrid />
 
         {/* Reference Blueprint Canvases */}
         <ReferenceCanvasMeshes />
+
+        {/* Shapr3D Reference Construction Axes */}
+        {constructionAxes
+          .filter((ax) => ax.visible)
+          .map((ax) => {
+            const p1: [number, number, number] = [
+              ax.origin[0] - ax.direction[0] * ax.lengthMm * 0.5,
+              ax.origin[1] - ax.direction[1] * ax.lengthMm * 0.5,
+              ax.origin[2] - ax.direction[2] * ax.lengthMm * 0.5,
+            ];
+            const p2: [number, number, number] = [
+              ax.origin[0] + ax.direction[0] * ax.lengthMm * 0.5,
+              ax.origin[1] + ax.direction[1] * ax.lengthMm * 0.5,
+              ax.origin[2] + ax.direction[2] * ax.lengthMm * 0.5,
+            ];
+            const posArray = new Float32Array([...p1, ...p2]);
+            return (
+              <line key={ax.id}>
+                <bufferGeometry>
+                  <bufferAttribute
+                    attach="attributes-position"
+                    args={[posArray, 3]}
+                  />
+                </bufferGeometry>
+                <lineBasicMaterial color="#f59e0b" linewidth={2} />
+              </line>
+            );
+          })}
 
         {/* 6-Plane Section Box Gizmo */}
         <SectionBoxGizmo />
@@ -276,13 +341,15 @@ export const CADViewport: React.FC = () => {
         {/* Shapr3D-Style Direct Manipulation 3D Gizmos */}
         <InteractiveGizmos />
 
-        <ContactShadows
-          position={[0, 0, -0.05]}
-          opacity={0.35}
-          scale={280}
-          blur={2.2}
-          far={80}
-        />
+        {groundReflection && (
+          <ContactShadows
+            position={[0, 0, -0.05]}
+            opacity={0.42}
+            scale={280}
+            blur={2.0}
+            far={80}
+          />
+        )}
 
         <OrbitControls
           ref={controlsRef}
